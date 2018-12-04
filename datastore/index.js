@@ -95,15 +95,31 @@ exports.update = (id, text, callback) => {
   
 };
 
+
+// fs.unlink('sample.txt', function (err) {
+//     if (err) throw err;
+//     // if no error, file has been deleted successfully
+//     console.log('File deleted!');
+// }); 
 exports.delete = (id, callback) => {
-  var item = items[id];
-  delete items[id];
-  if (!item) {
-    // report an error if item not found
-    callback(new Error(`No item with id: ${id}`));
-  } else {
-    callback();
-  }
+  // var item = items[id];
+  // delete items[id];
+  let newPath = path.join(exports.dataDir, id + '.txt');
+  fs.unlink(newPath, (err) => {
+    if (err) {
+      callback(new Error(`No item with id: ${id}`));
+    } else {
+      console.log(id);
+      console.log("it worked");
+      callback();
+    }
+  });
+  // if (!item) {
+  //   // report an error if item not found
+  //   callback(new Error(`No item with id: ${id}`));
+  // } else {
+  //   callback();
+  // }
 };
 
 // Config+Initialization code -- DO NOT MODIFY /////////////////////////////////
