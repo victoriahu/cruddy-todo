@@ -13,7 +13,7 @@ exports.create = (text, callback) => {
   counter.getNextUniqueId((err, id) => {
     
     let newPath = path.join(exports.dataDir, id + '.txt');
-    console.log("typeof text", typeof text);
+    // console.log("typeof text", typeof text);
     fs.writeFile(newPath, text, function(err) {
       if (err) {
         throw ('error writing counterString');
@@ -28,10 +28,21 @@ exports.create = (text, callback) => {
 
 exports.readAll = (callback) => {
   var data = [];
-  _.each(items, (text, id) => {
-    data.push({ id, text });
+  let newPath = exports.dataDir;
+  // console.log(newPath);
+  fs.readdir(newPath, (err, items) => {
+    if (err) {
+      throw ('error writing readall');
+    } else {
+      _.each(items, (id) => {
+        var savedTodo = id.slice(0, -4);
+        data.push({ id: savedTodo, text: savedTodo });
+      });
+      callback(null, data);
+    }
+    
   });
-  callback(null, data);
+  
 };
 
 exports.readOne = (id, callback) => {
