@@ -2,6 +2,8 @@ const fs = require('fs');
 const path = require('path');
 const _ = require('underscore');
 const counter = require('./counter');
+var Promise = require('bluebird');
+var fsAsync = Promise.promisifyAll(require("fs"));
 
 var items = {};
 
@@ -27,18 +29,24 @@ exports.create = (text, callback) => {
 };
 
 exports.readAll = (callback) => {
-  var data = [];
   let newPath = exports.dataDir;
   // console.log(newPath);
   fs.readdir(newPath, (err, items) => {
     if (err) {
       throw ('error writing readall');
     } else {
-      _.each(items, (id) => {
-        var savedTodo = id.slice(0, -4);
-        data.push({ id: savedTodo, text: savedTodo });
-      });
-      callback(null, data);
+      var data = items.map( item => {
+        var savedTodo = item.slice(0, -4); 
+        var newDir = path.join(newPath, item);
+        return fsAsync.readFileAsync(newDir)
+          .then(fileData => {
+            return { id: savedTodo, text: fileData.toString() };
+          });
+      }
+
+        
+      );
+      Promise.all(data).then( (item) => { return callback(null, item)});
     }
     
   });
